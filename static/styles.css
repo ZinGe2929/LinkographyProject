@@ -1,0 +1,113 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+}
+
+.header p {
+    max-width: 700px; /* 設定段落的最大寬度 */
+    margin: 0 auto; /* 讓段落文字水平置中 */
+    line-height: 1.6; /* 增加行距，讓文字更易讀 */
+    text-align: center; /* 中 */
+}
+
+.controls {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.canvas-container {
+    position: relative;
+    text-align: center;
+    border: 2px solid #007bff;
+    background-color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.methods-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 30px;
+    gap: 20px;
+}
+
+.method {
+    flex: 1;
+    border: 2px solid #333;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    text-align: center;
+}
+
+.method h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.method button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.method button:hover {
+    background-color: #0056b3;
+}
+
+.method p {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+}
+
+.footer {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+}
+
+.footer h3 {
+    font-size: 18px;
+    color: #333;
+}
+
+.footer p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+
+.references {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+}
+
+.references h3 {
+    font-size: 18px;
+    color: #333;
+}
+
+.references p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+    text-align: left; /* 確保文字左對齊 */
+}

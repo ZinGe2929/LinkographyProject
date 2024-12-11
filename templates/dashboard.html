@@ -1,0 +1,51 @@
+<canvas id="linkographyCanvas" width="800" height="600"></canvas>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.getElementById("linkographyCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Fetch moves data
+        fetch("/api/linkography_data")
+            .then(response => response.json())
+            .then(data => {
+                if (data.moves) {
+                    drawLinkography(data.moves, ctx);
+                }
+            });
+
+        // Draw Linkography based on moves
+        function drawLinkography(moves, ctx) {
+            const moveCount = moves.length;
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const spacing = canvasWidth / (moveCount + 1);
+
+            // Draw move points
+            moves.forEach((move, index) => {
+                const x = spacing * (index + 1);
+                const y = 50; // Top row
+
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeText(move.name, x - 10, y - 10);
+            });
+
+            // Draw diagonal lines for intersections
+            for (let i = 0; i < moveCount; i++) {
+                for (let j = i + 1; j < moveCount; j++) {
+                    const x1 = spacing * (i + 1);
+                    const x2 = spacing * (j + 1);
+                    const y1 = 50;
+                    const y2 = 50 + (j - i) * 30;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                }
+            }
+        }
+    });
+</script>
