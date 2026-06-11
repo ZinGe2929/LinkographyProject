@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const diagonalSpacing = 30; // 斜線節點之間的垂直距離
     let moveCount = 10; // 預設move數量
     const linkNodes = []; // 儲存節點資料
+    let hoverNode = null; // 預先宣告變數，避免嚴格模式報錯
 
     function drawLinkography() {
         // 清空畫布
@@ -190,30 +191,45 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeLinkNodes();
     drawLinkography();
 
+    // =========================================================
+    // 將畫布上的節點轉換為後端需要的 rows (0與1的二維陣列) 格式
+    // =========================================================
+    function generateRowsData() {
+        const currentMoveCount = parseInt(moveCountInput.value, 10);
+        const rows = Array.from({ length: currentMoveCount - 1 }, () => []);
+
+        const sortedNodes = [...linkNodes].sort((a, b) => a.move1 - b.move1);
+        
+        sortedNodes.forEach(node => {
+            const rowIndex = node.move2 - node.move1 - 1; 
+            if (rowIndex >= 0 && rowIndex < rows.length) {
+                rows[rowIndex].push(node.selected ? 1 : 0);
+            }
+        });
+        
+        return { rows, currentMoveCount };
+    }
+
+    // =========================================================
     // 熵計算按鈕事件
+    // =========================================================
     entropyButton.addEventListener("click", function () {
-        // 發送打點的資料到後端進行熵計算
-        const selectedLinks = linkNodes
-            .filter((node) => node.selected)
-            .map((node) => ({ move1: node.move1, move2: node.move2 }));
+        const { rows, currentMoveCount } = generateRowsData();
 
-        // 獲取當前的 move 數量
-        const moveCount = parseInt(moveCountInput.value, 10);
-
-        // 發送到後端
         fetch("/api/calculate_entropy", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ links: selectedLinks, move_count: moveCount  }),
+            body: JSON.stringify({ rows: rows, move_count: currentMoveCount }), 
         })
             .then((response) => response.json())
             .then((data) => {
                 if (data.error) {
                     alert(`Error: ${data.error}`);
                 } else {
-                    // 顯示計算結果
                     const resultElement = document.getElementById("entropy-result");
-                    resultElement.textContent = `creative value：${data.creativity.toFixed(3)}`;
+                    if (resultElement) {
+                        resultElement.textContent = `creative value：${data.creativity.toFixed(3)}`;
+                    }
                 }
             })
             .catch((error) => {
@@ -222,25 +238,16 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }); 
 
+    // =========================================================
     // Run Test 和 Logistic Regression 按鈕事件
+    // =========================================================
     runTestButton.addEventListener("click", function () {
-        const moveCount = parseInt(moveCountInput.value, 10);
-        const rows = linkNodes.reduce((acc, node) => {
-            const rowIndex = node.move2 - node.move1 - 1;
-            if (!acc[rowIndex]) acc[rowIndex] = { n1: 0, n2: 0, run_count: 0 };
-            if (node.selected) acc[rowIndex].n1++;
-            else acc[rowIndex].n2++;
-            return acc;
-        }, []);
-
-        rows.forEach((row) => {
-            row.run_count = row.n1 > 0 && row.n2 > 0 ? 2 : 1; // 簡化的run計算示例
-        });
+        const { rows, currentMoveCount } = generateRowsData();
 
         fetch("/api/calculate_run_test", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ rows, move_count: moveCount }),
+            body: JSON.stringify({ rows: rows, move_count: currentMoveCount }), 
         })
             .then((response) => response.json())
             .then((data) => {
@@ -248,7 +255,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert(`Error: ${data.error}`);
                 } else {
                     const resultElement = document.getElementById("run-test-result");
-                    resultElement.textContent = `probability value (p)：${data.p_value.toFixed(3)} | Total number of runs：${data.total_run_sum} | total probability sum：${data.total_probability_sum.toFixed(3)}`;
+                    if (resultElement) {
+                        resultElement.textContent = `probability value (p)：${data.logistic_p.toFixed(3)} | Total number of runs：${data.runs} | total probability sum：${data.p.toFixed(3)}`;
+                    }
                 }
             })
             .catch((error) => {
@@ -257,4 +266,4 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-});
+}); 
